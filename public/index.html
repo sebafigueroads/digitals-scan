@@ -70,11 +70,11 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 
 /* === Topbar === */
 .topbar { position: sticky; top: 0; z-index: 50; padding: 16px clamp(20px, 4vw, 44px); display: flex; justify-content: space-between; align-items: center; background: rgba(13,13,13,0.82); backdrop-filter: blur(18px); border-bottom: 1px solid var(--line); }
-.brand { display: flex; align-items: center; gap: 14px; }
-.brand img { height: 32px; width: auto; }
-.brand-tag { font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; letter-spacing: 0.26em; color: var(--cyan-bright); text-transform: uppercase; padding-left: 14px; border-left: 1px solid var(--line); margin-left: 4px; }
-.brand-tag strong { color: var(--text-pure); font-weight: 700; display: block; font-size: 11px; margin-bottom: 2px; }
-@media (max-width: 760px) { .brand img { height: 26px; } .brand-tag { display: none; } }
+.brand { display: flex; align-items: center; gap: 14px; color: var(--text-pure); }
+.logo-digitals { height: 42px; width: auto; display: block; color: var(--text-pure); }
+.brand-tag { font-family: var(--font-body); font-size: 11px; font-weight: 700; letter-spacing: 0.10em; color: var(--cyan-bright); text-transform: uppercase; padding-left: 14px; border-left: 1px solid var(--line); margin-left: 4px; }
+.brand-tag strong { color: var(--text-pure); font-weight: 800; display: block; font-size: 12px; margin-bottom: 2px; letter-spacing: 0.04em; }
+@media (max-width: 760px) { .logo-digitals { height: 34px; } .brand-tag { display: none; } }
 .topbar-right { display: flex; gap: 18px; align-items: center; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); }
 .topbar-right .live { display: inline-flex; align-items: center; gap: 7px; color: var(--signal); }
 .topbar-right .live::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 8px var(--signal); animation: pulse 1.6s infinite; }
@@ -244,7 +244,28 @@ h1 .em-y { color: var(--yellow); }
 .modal.done .form { display: none; }
 .modal.done .success { display: block; }
 
-/* Partner badges hero */
+/* Stat AEO/GEO vs SEO · industry shift */
+.stat-shift { margin: 40px auto 0; max-width: 920px; padding: 24px 30px; background: linear-gradient(135deg, rgba(229,187,85,0.10), rgba(18,128,155,0.08)); border: 1px solid rgba(229,187,85,0.32); border-radius: 18px; position: relative; overflow: hidden; }
+.stat-shift::before { content: ''; position: absolute; top: -30%; right: -10%; width: 280px; height: 280px; background: radial-gradient(circle, rgba(229,187,85,0.18), transparent 70%); border-radius: 50%; }
+.stat-shift-grid { display: grid; grid-template-columns: auto 1fr auto; gap: 28px; align-items: center; position: relative; }
+@media (max-width: 760px) { .stat-shift-grid { grid-template-columns: 1fr; gap: 16px; text-align: center; } }
+.stat-shift .num { font-family: var(--font-title); font-weight: 400; font-size: clamp(3rem, 5.5vw, 4.6rem); line-height: 0.95; letter-spacing: 0.01em; color: var(--yellow); padding-block: 0.04em; }
+.stat-shift .num small { font-family: var(--font-body); font-size: 0.34em; color: var(--text-muted); font-weight: 600; margin-left: 6px; letter-spacing: 0.04em; }
+.stat-shift .body strong { display: block; font-family: var(--font-title); font-size: clamp(1.1rem, 2vw, 1.45rem); font-weight: 400; line-height: 1.1; letter-spacing: 0.01em; text-transform: uppercase; margin-bottom: 6px; color: var(--text-pure); }
+.stat-shift .body span { font-size: 13.5px; line-height: 1.55; color: var(--text-soft); display: block; max-width: 56ch; }
+.stat-shift .bars { display: flex; flex-direction: column; gap: 8px; min-width: 160px; }
+@media (max-width: 760px) { .stat-shift .bars { min-width: 0; width: 100%; max-width: 280px; margin: 0 auto; } }
+.stat-shift .bar-row { font-family: var(--font-body); font-size: 10px; letter-spacing: 0.10em; font-weight: 700; color: var(--text-soft); text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+.stat-shift .bar-row .lbl { width: 64px; text-align: right; font-size: 10.5px; }
+.stat-shift .bar-row .bar { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 100px; overflow: hidden; }
+.stat-shift .bar-row .bar i { display: block; height: 100%; border-radius: 100px; transition: width 1.4s var(--ease-fluid); }
+.stat-shift .bar-row.seo .bar i { background: var(--cyan-bright); width: 0; }
+.stat-shift .bar-row.aeo .bar i { background: linear-gradient(90deg, var(--yellow), var(--red)); width: 0; }
+.stat-shift.active .bar-row.seo .bar i { width: 60%; }
+.stat-shift.active .bar-row.aeo .bar i { width: 95%; }
+.stat-shift .bar-row .pct { font-size: 10.5px; min-width: 38px; color: var(--text-pure); font-weight: 700; }
+
+/* Partner badges hero · más spacing */
 .partner-row { margin-top: 32px; display: inline-flex; align-items: center; gap: 18px; padding: 12px 22px; background: rgba(255,255,255,0.04); border: 1px solid var(--line-strong); border-radius: 100px; flex-wrap: wrap; justify-content: center; backdrop-filter: blur(8px); }
 .partner-row .lbl { font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; letter-spacing: 0.26em; color: var(--text-muted); text-transform: uppercase; }
 .partner-row .badges { display: inline-flex; gap: 16px; align-items: center; }
@@ -288,8 +309,12 @@ h1 .em-y { color: var(--yellow); }
 <div class="bg-orb-2"></div>
 
 <header class="topbar">
-  <a href="/" class="brand">
-    <img src="assets/logo/digitals-white.png" alt="Digitals · Agencia & Consultora"/>
+  <a href="/" class="brand" aria-label="Digitals · Agencia & Consultora">
+    <svg class="logo-digitals" viewBox="0 0 240 76" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M4 6 L8 6 L8 70 L232 70 L232 6 L236 6 L236 74 L4 74 Z M4 6 L60 6 M180 6 L236 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"/>
+      <text x="120" y="46" font-family="Montserrat, sans-serif" font-size="36" font-weight="500" fill="currentColor" text-anchor="middle" letter-spacing="-0.018em">Digitals</text>
+      <text x="120" y="64" font-family="Montserrat, sans-serif" font-size="8.5" font-weight="500" fill="currentColor" text-anchor="middle" letter-spacing="0.06em">Agencia &amp; Consultora</text>
+    </svg>
     <span class="brand-tag"><strong>Scan</strong>Free audit · Chile 2026</span>
   </a>
   <div class="topbar-right">
@@ -310,12 +335,26 @@ h1 .em-y { color: var(--yellow); }
     <div class="o-logo o4"><img src="assets/orbita/google.png" alt="Google"/></div>
     <div class="o-logo o5"><img src="assets/orbita/google-ads.png" alt="Google Ads"/></div>
     <div class="o-logo o6"><img src="assets/orbita/meta.png" alt="Meta"/></div>
-    <div class="o-logo o7"><img src="assets/orbita/elevenlabs.png" alt="ElevenLabs"/></div>
   </div>
 
   <span class="eyebrow">Auditoría web · Gratis · 30 segundos</span>
   <h1>Audita tu web<br/>en <span class="em">Performance</span> <span class="em-y">SEO</span> &amp; <span class="em">AEO/GEO</span></h1>
   <p class="hero-sub">Pon la URL de tu sitio y te devolvemos un análisis completo: <strong>Core Web Vitals</strong> (Google PageSpeed Insights), <strong>SEO técnico</strong> y <strong>optimización para crawlers de IA</strong> (ChatGPT, Claude, Gemini, Perplexity). Score 0-100 y plan de mejoras priorizado.</p>
+
+  <div class="stat-shift" id="statShift">
+    <div class="stat-shift-grid">
+      <div class="num">+540<small>%</small></div>
+      <div class="body">
+        <strong>AEO &amp; GEO crecieron 540% en 2 años</strong>
+        <span>El SEO clásico sigue siendo crítico. Pero la <strong style="color:var(--yellow);">búsqueda con IA</strong> (ChatGPT, Claude, Gemini, Perplexity) ya mueve <strong style="color:var(--yellow);">1 de cada 4 consultas</strong>. Quien no optimiza para AEO/GEO/LLMO hoy, queda fuera del nuevo discovery layer.</span>
+      </div>
+      <div class="bars">
+        <div class="bar-row seo"><span class="lbl">SEO</span><span class="bar"><i></i></span><span class="pct">60%</span></div>
+        <div class="bar-row aeo"><span class="lbl">AEO/GEO</span><span class="bar"><i></i></span><span class="pct">95%</span></div>
+        <div style="font-family: var(--font-body); font-size: 9.5px; letter-spacing: 0.10em; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-top: 4px;">Importancia para 2026</div>
+      </div>
+    </div>
+  </div>
 
   <form class="scan-form" id="scanForm">
     <input type="text" id="urlInput" placeholder="tudominio.cl" autocomplete="off" required/>
@@ -424,6 +463,7 @@ h1 .em-y { color: var(--yellow); }
 
 <script>
 const $ = (s) => document.querySelector(s);
+setTimeout(() => document.getElementById('statShift')?.classList.add('active'), 400);
 const form = $('#scanForm');
 const input = $('#urlInput');
 const btn = $('#scanBtn');
