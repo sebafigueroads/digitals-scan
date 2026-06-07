@@ -343,9 +343,8 @@ function buildReportHtml({ name, url, score, scanData }) {
 <div style="max-width:640px;margin:0 auto;background:#141414;">
 
   <div style="padding:32px 36px;border-bottom:1px solid rgba(255,255,255,0.08);">
-    <div style="font-size:28px;font-weight:500;letter-spacing:-0.02em;color:#fff;">Digitals</div>
-    <div style="height:5px;width:130px;background:linear-gradient(90deg,#12809b 0%,#5ec97a 25%,#e5bb55 50%,#e88b3a 75%,#db666a 100%);margin-top:6px;border-radius:2px;"></div>
-    <div style="margin-top:24px;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#7a7a7a;font-weight:600;">Auditoría web · scan.digitals.cl</div>
+    <img src="https://scan.digitals.cl/assets/logo/digitals-logo.png" alt="Digitals" width="80" height="80" style="display:block;border-radius:10px;"/>
+    <div style="margin-top:22px;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#7a7a7a;font-weight:600;">Auditoría web · scan.digitals.cl</div>
   </div>
 
   <div style="padding:32px 36px;">
