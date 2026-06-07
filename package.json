@@ -1,0 +1,15 @@
+{
+  "name": "scan-digitals",
+  "version": "1.0.0",
+  "description": "Digitals Scan · web audit tool · Performance + SEO + AEO/GEO/LLMO",
+  "main": "server.js",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
