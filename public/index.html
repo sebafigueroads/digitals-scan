@@ -71,10 +71,10 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 /* === Topbar === */
 .topbar { position: sticky; top: 0; z-index: 50; padding: 16px clamp(20px, 4vw, 44px); display: flex; justify-content: space-between; align-items: center; background: rgba(13,13,13,0.82); backdrop-filter: blur(18px); border-bottom: 1px solid var(--line); }
 .brand { display: flex; align-items: center; gap: 14px; }
-.brand-logo { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-title); font-size: 26px; letter-spacing: 0.08em; color: var(--text-pure); text-transform: uppercase; line-height: 1; }
-.brand-logo .dot { color: var(--cyan); font-size: 18px; line-height: 1; }
-.brand-sub { font-family: var(--font-mono); font-size: 9.5px; font-weight: 500; letter-spacing: 0.28em; color: var(--text-muted); text-transform: uppercase; padding-left: 14px; border-left: 1px solid var(--line); margin-left: 4px; }
-@media (max-width: 600px) { .brand-sub { display: none; } }
+.brand img { height: 32px; width: auto; }
+.brand-tag { font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; letter-spacing: 0.26em; color: var(--cyan-bright); text-transform: uppercase; padding-left: 14px; border-left: 1px solid var(--line); margin-left: 4px; }
+.brand-tag strong { color: var(--text-pure); font-weight: 700; display: block; font-size: 11px; margin-bottom: 2px; }
+@media (max-width: 760px) { .brand img { height: 26px; } .brand-tag { display: none; } }
 .topbar-right { display: flex; gap: 18px; align-items: center; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); }
 .topbar-right .live { display: inline-flex; align-items: center; gap: 7px; color: var(--signal); }
 .topbar-right .live::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 8px var(--signal); animation: pulse 1.6s infinite; }
@@ -221,10 +221,42 @@ h1 .em-y { color: var(--yellow); }
 .modal.done .form { display: none; }
 .modal.done .success { display: block; }
 
-/* Footer */
-.foot { padding: 44px clamp(20px, 5vw, 60px); border-top: 1px solid var(--line); position: relative; z-index: 5; text-align: center; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.10em; color: var(--text-muted); }
-.foot a { color: var(--cyan-bright); }
-.foot a:hover { color: var(--yellow); }
+/* Partner badges hero */
+.partner-row { margin-top: 32px; display: inline-flex; align-items: center; gap: 18px; padding: 12px 22px; background: rgba(255,255,255,0.04); border: 1px solid var(--line-strong); border-radius: 100px; flex-wrap: wrap; justify-content: center; backdrop-filter: blur(8px); }
+.partner-row .lbl { font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; letter-spacing: 0.26em; color: var(--text-muted); text-transform: uppercase; }
+.partner-row .badges { display: inline-flex; gap: 16px; align-items: center; }
+.partner-row img { height: 30px; width: auto; opacity: 0.92; transition: opacity 0.25s, transform 0.25s; }
+.partner-row img:hover { opacity: 1; transform: scale(1.05); }
+@media (max-width: 600px) { .partner-row img { height: 24px; } .partner-row { gap: 12px; padding: 10px 16px; } }
+
+/* Orbita floating LLMs en sección AEO/GEO */
+.aeo-orbita { position: relative; margin: 0 auto 32px; max-width: 720px; padding: 30px 0 50px; min-height: 200px; display: grid; place-items: center; }
+.aeo-core { padding: 16px 28px; background: linear-gradient(135deg, var(--cyan), var(--yellow)); border-radius: 18px; box-shadow: 0 18px 36px rgba(18,128,155,0.32); position: relative; z-index: 2; }
+.aeo-core::before { content: ''; position: absolute; inset: -8px; border: 1.5px solid rgba(18,128,155,0.45); border-radius: 24px; animation: coreBreath 3s ease-in-out infinite; }
+.aeo-core strong { font-family: var(--font-title); font-size: 1.6rem; color: var(--bg-charcoal); letter-spacing: 0.04em; }
+@keyframes coreBreath { 50% { transform: scale(1.06); opacity: 0.5; } }
+.aeo-orb { position: absolute; width: 50px; height: 50px; background: #fff; border-radius: 12px; display: grid; place-items: center; box-shadow: 0 12px 26px rgba(0,0,0,0.32); transition: transform 0.3s var(--ease-fluid); }
+.aeo-orb:hover { transform: scale(1.16) rotate(-3deg); z-index: 10; }
+.aeo-orb img { max-width: 70%; max-height: 70%; }
+.aeo-orb.f1 { animation: float1 6s ease-in-out infinite; }
+.aeo-orb.f2 { animation: float2 7s ease-in-out infinite; }
+.aeo-orb.f3 { animation: float3 8s ease-in-out infinite; }
+@keyframes float1 { 50% { transform: translateY(-12px); } }
+@keyframes float2 { 50% { transform: translateY(-16px); } }
+@keyframes float3 { 50% { transform: translateY(-9px); } }
+@media (max-width: 600px) { .aeo-orb { width: 38px; height: 38px; border-radius: 9px; } }
+
+/* Footer Grupo Digitals */
+.foot { padding: 50px clamp(20px, 5vw, 60px) 30px; border-top: 1px solid var(--line); position: relative; z-index: 5; }
+.foot-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 24px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+.foot-grupo { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.foot-grupo .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+.foot-grupo img { height: 42px; width: auto; opacity: 0.9; transition: opacity 0.3s; }
+.foot-grupo img:hover { opacity: 1; }
+.foot-copy { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.10em; color: var(--text-muted); }
+.foot-copy a { color: var(--cyan-bright); }
+.foot-copy a:hover { color: var(--yellow); }
+@media (max-width: 600px) { .foot-inner { justify-content: center; text-align: center; } }
 </style>
 </head>
 <body>
@@ -235,8 +267,8 @@ h1 .em-y { color: var(--yellow); }
 
 <header class="topbar">
   <a href="/" class="brand">
-    <span class="brand-logo">DIGITALS<span class="dot">·</span>SCAN</span>
-    <span class="brand-sub">Free audit · Chile 2026</span>
+    <img src="assets/logo/digitals-white.png" alt="Digitals · Agencia & Consultora"/>
+    <span class="brand-tag"><strong>Scan</strong>Free audit · Chile 2026</span>
   </a>
   <div class="topbar-right">
     <span class="live">SCAN LIVE</span>
@@ -262,6 +294,16 @@ h1 .em-y { color: var(--yellow); }
     <span>AEO · GEO · LLMO</span>
     <span>Core Web Vitals</span>
     <span>Plan de mejoras</span>
+  </div>
+
+  <div class="partner-row">
+    <span class="lbl">Partners</span>
+    <div class="badges">
+      <img src="assets/partners/cert-google.webp" alt="Google Premier Partner" title="Google Premier Partner"/>
+      <img src="assets/partners/cert-meta.webp" alt="Meta Business Partner" title="Meta Business Partner"/>
+      <img src="assets/partners/cert-linkedin.webp" alt="LinkedIn Marketing Partner" title="LinkedIn Marketing Partner"/>
+      <img src="assets/partners/cert-shopify.webp" alt="Shopify Partner" title="Shopify Partner"/>
+    </div>
   </div>
 
   <div class="loader" id="loader">
@@ -296,6 +338,18 @@ h1 .em-y { color: var(--yellow); }
   <div class="checks" id="seoChecks"></div>
 
   <div class="section-h"><span class="num">03</span><h3>AEO / GEO / LLMO (crawlers de IA)</h3></div>
+
+  <div class="aeo-orbita">
+    <div class="aeo-core"><strong>LLM SCAN</strong></div>
+    <div class="aeo-orb f1" style="top: 8%; left: 8%;"><img src="assets/orbita/chatgpt.png" alt="ChatGPT"/></div>
+    <div class="aeo-orb f2" style="top: 14%; right: 12%;"><img src="assets/orbita/claude.png" alt="Claude"/></div>
+    <div class="aeo-orb f3" style="bottom: 18%; left: 6%;"><img src="assets/orbita/gemini.png" alt="Gemini"/></div>
+    <div class="aeo-orb f1" style="top: 35%; left: 25%;"><img src="assets/orbita/google.png" alt="Google"/></div>
+    <div class="aeo-orb f2" style="bottom: 8%; right: 25%;"><img src="assets/orbita/google-ads.png" alt="Google Ads"/></div>
+    <div class="aeo-orb f3" style="top: 35%; right: 26%;"><img src="assets/orbita/meta.png" alt="Meta"/></div>
+    <div class="aeo-orb f1" style="bottom: 22%; right: 6%;"><img src="assets/orbita/elevenlabs.png" alt="ElevenLabs"/></div>
+  </div>
+
   <div class="checks" id="aeoChecks"></div>
 
   <div class="section-h"><span class="num">04</span><h3>Plan de mejoras priorizado</h3></div>
@@ -335,7 +389,15 @@ h1 .em-y { color: var(--yellow); }
 </div>
 
 <footer class="foot">
-  © 2026 · Powered by <a href="https://digitals.cl" target="_blank" rel="noopener">Digitals</a> · Agencia de marketing digital + IA · Chile
+  <div class="foot-inner">
+    <div class="foot-grupo">
+      <span class="lbl">— Powered by</span>
+      <a href="https://grupodigitals.com" target="_blank" rel="noopener"><img src="assets/logo/grupo-digitals.png" alt="Grupo Digitals"/></a>
+    </div>
+    <div class="foot-copy">
+      © 2026 · <a href="https://digitals.cl" target="_blank" rel="noopener">Digitals</a> · Agencia de marketing digital + IA · Chile
+    </div>
+  </div>
 </footer>
 
 <script>
