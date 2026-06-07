@@ -42,19 +42,19 @@ async function fetchWithTimeout(url, opts = {}, timeoutMs = 15000) {
 
 // === Google PageSpeed Insights ===
 async function runPSI(url, strategy = 'mobile') {
-  const params = new URLSearchParams({
-    url,
-    strategy,
-    category: ['performance','accessibility','best-practices','seo'].join('&category=')
-  });
-  // category necesita repetirse; lo armamos a mano
+  if (!PSI_API_KEY) {
+    return { unavailable: true, reason: 'missing-api-key', message: 'PSI API key no configurada (set PSI_API_KEY env var en Dokploy).' };
+  }
   const psiUrl = `${PSI_BASE}?url=${encodeURIComponent(url)}&strategy=${strategy}` +
                  `&category=performance&category=accessibility&category=best-practices&category=seo` +
-                 (PSI_API_KEY ? `&key=${PSI_API_KEY}` : '');
+                 `&key=${PSI_API_KEY}`;
   const r = await fetchWithTimeout(psiUrl, {}, 35000);
   if (!r.ok) {
     const text = await r.text().catch(() => '');
-    throw new Error('PSI ' + r.status + ': ' + text.slice(0, 200));
+    let reason = 'api-error';
+    if (r.status === 429) reason = 'rate-limit';
+    if (r.status === 400) reason = 'bad-url';
+    return { unavailable: true, reason, status: r.status, message: text.slice(0, 300) };
   }
   const data = await r.json();
   const lh = data.lighthouseResult || {};
@@ -237,14 +237,24 @@ function consolidate(scan) {
   ];
   for (const c of aeoChecks) if (c.ok) aeoScore += c.weight;
 
-  // Score global ponderado
-  const globalScore = Math.round(
-    (psi.scores?.performance || 0) * 0.30 +
-    (psi.scores?.seo || 0)         * 0.25 +
-    aeoScore                       * 0.25 +
-    (psi.scores?.accessibility || 0) * 0.10 +
-    (psi.scores?.bestPractices || 0) * 0.10
-  );
+  // Score global ponderado · si PSI no disponible, score basado solo en SEO/AEO scrape
+  const psiOk = !psi.unavailable && psi.scores;
+  let globalScore;
+  if (psiOk) {
+    globalScore = Math.round(
+      (psi.scores.performance || 0) * 0.30 +
+      (psi.scores.seo || 0)         * 0.25 +
+      aeoScore                       * 0.25 +
+      (psi.scores.accessibility || 0) * 0.10 +
+      (psi.scores.bestPractices || 0) * 0.10
+    );
+  } else {
+    // SEO básico: tiene title+desc+canonical+H1+viewport ok = 70 puntos
+    const seoBasic = (seo.title?.ok ? 18 : 0) + (seo.description?.ok ? 18 : 0) +
+                     (seo.canonical?.has ? 12 : 0) + (seo.viewport?.has ? 10 : 0) +
+                     (seo.headings?.h1Count === 1 ? 12 : 0);
+    globalScore = Math.round(aeoScore * 0.55 + seoBasic * 0.45);
+  }
 
   // Top recomendaciones priorizadas
   const recos = [];

@@ -370,12 +370,15 @@ function renderResults(s) {
   // Categories
   const catRow = $('#catRow');
   catRow.innerHTML = '';
-  const cats = [
+  const psiOk = !s.psi?.unavailable;
+  const cats = psiOk ? [
     { lbl: 'Performance', val: s.psi?.scores?.performance ?? 0 },
     { lbl: 'SEO', val: s.psi?.scores?.seo ?? 0 },
     { lbl: 'AEO/GEO/LLMO', val: cs.aeoScore ?? 0 },
     { lbl: 'Accesibilidad', val: s.psi?.scores?.accessibility ?? 0 },
     { lbl: 'Best Practices', val: s.psi?.scores?.bestPractices ?? 0 }
+  ] : [
+    { lbl: 'AEO/GEO/LLMO', val: cs.aeoScore ?? 0 }
   ];
   for (const c of cats) {
     const b = bandClass(c.val);
@@ -387,18 +390,24 @@ function renderResults(s) {
 
   // Core Web Vitals
   const cwv = $('#cwvGrid');
-  cwv.innerHTML = '';
-  const metrics = [
-    { key: 'LCP', name: 'Largest Contentful Paint', m: 'lcp' },
-    { key: 'CLS', name: 'Cumulative Layout Shift', m: 'cls' },
-    { key: 'FCP', name: 'First Contentful Paint', m: 'fcp' },
-    { key: 'TBT', name: 'Total Blocking Time', m: 'tbt' },
-    { key: 'SI',  name: 'Speed Index', m: 'si' }
-  ];
-  for (const x of metrics) {
-    const v = s.psi?.coreWebVitals?.[x.m] || {};
-    const b = cwvBand(x.m, v.value);
-    cwv.innerHTML += `<div class="cwv-tile ${b}"><div class="key">${x.key}</div><div class="name">${x.name}</div><div class="v">${v.display || '—'}</div></div>`;
+  const cwvSection = cwv.parentElement;
+  const cwvHead = cwv.previousElementSibling;
+  if (!psiOk) {
+    cwv.innerHTML = `<div style="grid-column: 1/-1; padding: 30px; background: rgba(255,184,28,0.06); border: 1px solid rgba(255,184,28,0.32); border-radius: 14px; color: var(--warn); font-size: 13.5px; line-height: 1.6;"><strong>⚠ Performance metrics no disponibles.</strong> Configurar <code style="font-family:var(--f-mono);color:var(--accent);">PSI_API_KEY</code> en Dokploy con una API key de <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener" style="color:var(--accent);">Google Cloud Console</a> (PageSpeed Insights API, gratis hasta 25.000 requests/día) para activar Core Web Vitals + scores Performance/SEO/A11y/Best Practices.</div>`;
+  } else {
+    cwv.innerHTML = '';
+    const metrics = [
+      { key: 'LCP', name: 'Largest Contentful Paint', m: 'lcp' },
+      { key: 'CLS', name: 'Cumulative Layout Shift', m: 'cls' },
+      { key: 'FCP', name: 'First Contentful Paint', m: 'fcp' },
+      { key: 'TBT', name: 'Total Blocking Time', m: 'tbt' },
+      { key: 'SI',  name: 'Speed Index', m: 'si' }
+    ];
+    for (const x of metrics) {
+      const v = s.psi?.coreWebVitals?.[x.m] || {};
+      const b = cwvBand(x.m, v.value);
+      cwv.innerHTML += `<div class="cwv-tile ${b}"><div class="key">${x.key}</div><div class="name">${x.name}</div><div class="v">${v.display || '—'}</div></div>`;
+    }
   }
 
   // SEO checks
