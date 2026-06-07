@@ -47,7 +47,8 @@
 
   --font-title:   'Bebas Neue', system-ui, sans-serif;
   --font-body:    'Montserrat', system-ui, sans-serif;
-  --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+  /* Mono = Montserrat con tracking · evita aspecto "robot imprenta" */
+  --font-mono:    'Montserrat', system-ui, sans-serif;
 
   --ease-fluid:   cubic-bezier(0.19, 1, 0.22, 1);
   color-scheme:   dark;
@@ -59,8 +60,7 @@ a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; cursor: pointer; background: none; border: 0; }
 ::selection { background: var(--cyan); color: var(--text-pure); }
 
-/* === BG atmospheric === */
-.bg-grid { position: fixed; inset: 0; z-index: 1; pointer-events: none; background-image: linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px); background-size: 60px 60px; mask-image: radial-gradient(ellipse 100% 90% at center, black 30%, transparent); -webkit-mask-image: radial-gradient(ellipse 100% 90% at center, black 30%, transparent); }
+/* === BG · sin grid · solo orbs suaves === */
 .bg-orb { position: fixed; top: -20%; right: -15%; width: 65vw; height: 65vw; max-width: 1000px; max-height: 1000px; border-radius: 50%; background: radial-gradient(ellipse, rgba(18,128,155,0.22), transparent 60%); filter: blur(80px); pointer-events: none; z-index: 0; }
 .bg-orb-2 { position: fixed; bottom: -25%; left: -15%; width: 50vw; height: 50vw; max-width: 800px; max-height: 800px; border-radius: 50%; background: radial-gradient(ellipse, rgba(229,187,85,0.10), transparent 60%); filter: blur(80px); pointer-events: none; z-index: 0; }
 
@@ -82,9 +82,32 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 @keyframes pulse { 50% { opacity: 0.35; } }
 @media (max-width: 500px) { .topbar-right .live { display: none; } }
 
-/* === Hero === */
-.hero { position: relative; z-index: 5; padding: clamp(60px, 10vh, 120px) clamp(20px, 5vw, 60px) clamp(40px, 6vh, 70px); max-width: 1100px; margin: 0 auto; text-align: center; overflow: hidden; }
-.eyebrow { display: inline-flex; align-items: center; gap: 10px; padding: 7px 16px; background: rgba(18,128,155,0.10); border: 1px solid rgba(18,128,155,0.35); font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; letter-spacing: 0.24em; color: var(--cyan-bright); text-transform: uppercase; border-radius: 100px; margin-bottom: 32px; }
+/* === Hero · órbita LLMs alrededor del texto === */
+.hero { position: relative; z-index: 5; padding: clamp(60px, 10vh, 120px) clamp(20px, 5vw, 60px) clamp(40px, 6vh, 70px); max-width: 1280px; margin: 0 auto; text-align: center; overflow: visible; }
+
+.hero-orbita { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.hero-orbita .o-logo { position: absolute; width: 60px; height: 60px; background: #fff; border-radius: 14px; display: grid; place-items: center; box-shadow: 0 16px 32px rgba(0,0,0,0.32); transition: transform 0.3s var(--ease-fluid); pointer-events: auto; }
+.hero-orbita .o-logo:hover { transform: scale(1.16) rotate(-3deg); box-shadow: 0 22px 40px rgba(18,128,155,0.32); z-index: 10; }
+.hero-orbita .o-logo img { max-width: 70%; max-height: 70%; object-fit: contain; }
+.hero-orbita .o1  { top: 12%; left: 4%;    animation: floatA 6s ease-in-out infinite; }
+.hero-orbita .o2  { top: 8%;  right: 6%;   animation: floatB 7s ease-in-out infinite; }
+.hero-orbita .o3  { top: 42%; left: 1%;    animation: floatC 8s ease-in-out infinite; }
+.hero-orbita .o4  { top: 38%; right: 2%;   animation: floatA 6.5s ease-in-out infinite reverse; }
+.hero-orbita .o5  { bottom: 22%; left: 8%; animation: floatB 7.5s ease-in-out infinite; }
+.hero-orbita .o6  { bottom: 25%; right: 10%; animation: floatC 6.8s ease-in-out infinite; }
+.hero-orbita .o7  { top: 22%; left: 15%;   animation: floatA 7.2s ease-in-out infinite reverse; }
+@keyframes floatA { 50% { transform: translateY(-14px) rotate(2deg); } }
+@keyframes floatB { 50% { transform: translateY(-18px) rotate(-3deg); } }
+@keyframes floatC { 50% { transform: translateY(-10px) rotate(2deg); } }
+@media (max-width: 980px) { .hero-orbita .o-logo { width: 46px; height: 46px; border-radius: 11px; } .hero-orbita .o2, .hero-orbita .o7 { display: none; } }
+@media (max-width: 700px) {
+  .hero-orbita .o-logo { width: 38px; height: 38px; border-radius: 10px; }
+  .hero-orbita .o4, .hero-orbita .o6 { display: none; }
+  .hero-orbita .o1 { top: 5%; left: 3%; }
+  .hero-orbita .o3 { top: 35%; left: -2%; }
+  .hero-orbita .o5 { bottom: 5%; left: 4%; }
+}
+.eyebrow { display: inline-flex; align-items: center; gap: 10px; padding: 8px 18px; background: rgba(18,128,155,0.10); border: 1px solid rgba(18,128,155,0.35); font-family: var(--font-body); font-size: 12px; font-weight: 700; letter-spacing: 0.10em; color: var(--cyan-bright); text-transform: uppercase; border-radius: 100px; margin-bottom: 32px; }
 .eyebrow::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--cyan-bright); box-shadow: 0 0 10px var(--cyan-bright); animation: pulse 1.8s infinite; }
 h1 { font-family: var(--font-title); font-weight: 400; font-size: clamp(3rem, 9vw, 7.5rem); line-height: 0.92; letter-spacing: 0.005em; margin-bottom: 28px; text-transform: uppercase; }
 h1 .em { color: var(--cyan-bright); }
@@ -247,21 +270,20 @@ h1 .em-y { color: var(--yellow); }
 @media (max-width: 600px) { .aeo-orb { width: 38px; height: 38px; border-radius: 9px; } }
 
 /* Footer Grupo Digitals */
-.foot { padding: 50px clamp(20px, 5vw, 60px) 30px; border-top: 1px solid var(--line); position: relative; z-index: 5; }
-.foot-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 24px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-.foot-grupo { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
-.foot-grupo .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
-.foot-grupo img { height: 42px; width: auto; opacity: 0.9; transition: opacity 0.3s; }
+.foot { padding: 56px clamp(20px, 5vw, 60px) 36px; border-top: 1px solid var(--line); position: relative; z-index: 5; }
+.foot-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 28px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+.foot-grupo { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.foot-grupo .lbl { font-family: var(--font-title); font-size: 18px; letter-spacing: 0.10em; text-transform: uppercase; color: var(--text-muted); font-weight: 400; }
+.foot-grupo img { height: 88px; width: auto; opacity: 0.95; transition: opacity 0.3s; }
 .foot-grupo img:hover { opacity: 1; }
-.foot-copy { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.10em; color: var(--text-muted); }
-.foot-copy a { color: var(--cyan-bright); }
+.foot-copy { font-family: var(--font-body); font-size: 12.5px; letter-spacing: 0.02em; color: var(--text-soft); font-weight: 500; }
+.foot-copy a { color: var(--cyan-bright); font-weight: 600; }
 .foot-copy a:hover { color: var(--yellow); }
-@media (max-width: 600px) { .foot-inner { justify-content: center; text-align: center; } }
+@media (max-width: 600px) { .foot-inner { justify-content: center; text-align: center; } .foot-grupo img { height: 68px; } }
 </style>
 </head>
 <body>
 
-<div class="bg-grid"></div>
 <div class="bg-orb"></div>
 <div class="bg-orb-2"></div>
 
@@ -279,6 +301,17 @@ h1 .em-y { color: var(--yellow); }
 <section class="hero">
   <span class="holo" style="top: -20px; right: -50px;">SCAN</span>
   <span class="holo yellow" style="bottom: -60px; left: -40px;">AUDIT</span>
+
+  <!-- Orbita LLMs flotando alrededor -->
+  <div class="hero-orbita" aria-hidden="true">
+    <div class="o-logo o1"><img src="assets/orbita/chatgpt.png" alt="ChatGPT"/></div>
+    <div class="o-logo o2"><img src="assets/orbita/claude.png" alt="Claude"/></div>
+    <div class="o-logo o3"><img src="assets/orbita/gemini.png" alt="Gemini"/></div>
+    <div class="o-logo o4"><img src="assets/orbita/google.png" alt="Google"/></div>
+    <div class="o-logo o5"><img src="assets/orbita/google-ads.png" alt="Google Ads"/></div>
+    <div class="o-logo o6"><img src="assets/orbita/meta.png" alt="Meta"/></div>
+    <div class="o-logo o7"><img src="assets/orbita/elevenlabs.png" alt="ElevenLabs"/></div>
+  </div>
 
   <span class="eyebrow">Auditoría web · Gratis · 30 segundos</span>
   <h1>Audita tu web<br/>en <span class="em">Performance</span> <span class="em-y">SEO</span> &amp; <span class="em">AEO/GEO</span></h1>
@@ -338,17 +371,6 @@ h1 .em-y { color: var(--yellow); }
   <div class="checks" id="seoChecks"></div>
 
   <div class="section-h"><span class="num">03</span><h3>AEO / GEO / LLMO (crawlers de IA)</h3></div>
-
-  <div class="aeo-orbita">
-    <div class="aeo-core"><strong>LLM SCAN</strong></div>
-    <div class="aeo-orb f1" style="top: 8%; left: 8%;"><img src="assets/orbita/chatgpt.png" alt="ChatGPT"/></div>
-    <div class="aeo-orb f2" style="top: 14%; right: 12%;"><img src="assets/orbita/claude.png" alt="Claude"/></div>
-    <div class="aeo-orb f3" style="bottom: 18%; left: 6%;"><img src="assets/orbita/gemini.png" alt="Gemini"/></div>
-    <div class="aeo-orb f1" style="top: 35%; left: 25%;"><img src="assets/orbita/google.png" alt="Google"/></div>
-    <div class="aeo-orb f2" style="bottom: 8%; right: 25%;"><img src="assets/orbita/google-ads.png" alt="Google Ads"/></div>
-    <div class="aeo-orb f3" style="top: 35%; right: 26%;"><img src="assets/orbita/meta.png" alt="Meta"/></div>
-    <div class="aeo-orb f1" style="bottom: 22%; right: 6%;"><img src="assets/orbita/elevenlabs.png" alt="ElevenLabs"/></div>
-  </div>
 
   <div class="checks" id="aeoChecks"></div>
 
