@@ -70,11 +70,13 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 
 /* === Topbar === */
 .topbar { position: sticky; top: 0; z-index: 50; padding: 16px clamp(20px, 4vw, 44px); display: flex; justify-content: space-between; align-items: center; background: rgba(13,13,13,0.82); backdrop-filter: blur(18px); border-bottom: 1px solid var(--line); }
-.brand { display: flex; align-items: center; gap: 14px; color: var(--text-pure); }
-.logo-digitals { height: 42px; width: auto; display: block; color: var(--text-pure); }
+.brand { display: flex; align-items: center; gap: 16px; color: var(--text-pure); }
+.brand-wordmark { display: flex; flex-direction: column; align-items: center; gap: 5px; line-height: 0.9; }
+.brand-word { font-family: var(--font-body); font-weight: 500; font-size: 30px; letter-spacing: -0.02em; color: var(--text-pure); line-height: 1; }
+.brand-bar { display: block; height: 5px; width: 130px; object-fit: cover; object-position: center; image-rendering: -webkit-optimize-contrast; }
 .brand-tag { font-family: var(--font-body); font-size: 11px; font-weight: 700; letter-spacing: 0.10em; color: var(--cyan-bright); text-transform: uppercase; padding-left: 14px; border-left: 1px solid var(--line); margin-left: 4px; }
 .brand-tag strong { color: var(--text-pure); font-weight: 800; display: block; font-size: 12px; margin-bottom: 2px; letter-spacing: 0.04em; }
-@media (max-width: 760px) { .logo-digitals { height: 34px; } .brand-tag { display: none; } }
+@media (max-width: 760px) { .brand-word { font-size: 22px; } .brand-bar { width: 96px; height: 4px; } .brand-tag { display: none; } }
 .topbar-right { display: flex; gap: 18px; align-items: center; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); }
 .topbar-right .live { display: inline-flex; align-items: center; gap: 7px; color: var(--signal); }
 .topbar-right .live::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 8px var(--signal); animation: pulse 1.6s infinite; }
@@ -310,11 +312,10 @@ h1 .em-y { color: var(--yellow); }
 
 <header class="topbar">
   <a href="/" class="brand" aria-label="Digitals · Agencia & Consultora">
-    <svg class="logo-digitals" viewBox="0 0 240 76" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M4 6 L8 6 L8 70 L232 70 L232 6 L236 6 L236 74 L4 74 Z M4 6 L60 6 M180 6 L236 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"/>
-      <text x="120" y="46" font-family="Montserrat, sans-serif" font-size="36" font-weight="500" fill="currentColor" text-anchor="middle" letter-spacing="-0.018em">Digitals</text>
-      <text x="120" y="64" font-family="Montserrat, sans-serif" font-size="8.5" font-weight="500" fill="currentColor" text-anchor="middle" letter-spacing="0.06em">Agencia &amp; Consultora</text>
-    </svg>
+    <span class="brand-wordmark">
+      <span class="brand-word">Digitals</span>
+      <img class="brand-bar" src="assets/logo/digitals-bar.png" alt=""/>
+    </span>
     <span class="brand-tag"><strong>Scan</strong>Free audit · Chile 2026</span>
   </a>
   <div class="topbar-right">
@@ -631,7 +632,8 @@ $('#leadForm').addEventListener('submit', async (e) => {
       body: JSON.stringify({
         name, email, phone,
         url: lastScan?.url || '',
-        score: lastScan?.consolidated?.globalScore || 0
+        score: lastScan?.consolidated?.globalScore || 0,
+        scanData: lastScan || null
       })
     });
     if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error(d.error || 'Error'); }

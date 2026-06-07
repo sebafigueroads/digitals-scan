@@ -15,11 +15,13 @@ const PORT = process.env.PORT || 3000;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // === Env vars ===
-const HAPEE_PIT          = process.env.HAPEE_PIT || 'pit-60913a06-a23c-4de4-9f60-7b484dac855b';
-const HAPEE_LOCATION_ID  = process.env.HAPEE_LOCATION_ID || 'tPqE8ZXL6r8h5e9k0SGQ';
+const HAPEE_PIT          = process.env.HAPEE_PIT || '';
+const HAPEE_LOCATION_ID  = process.env.HAPEE_LOCATION_ID || '';
 const HAPEE_API_BASE     = process.env.HAPEE_API_BASE || 'https://services.leadconnectorhq.com';
 const HAPEE_API_VERSION  = process.env.HAPEE_API_VERSION || '2021-07-28';
 const PSI_API_KEY        = process.env.PSI_API_KEY || ''; // opcional, sin key tiene rate-limit más bajo
+if (!HAPEE_PIT || !HAPEE_LOCATION_ID) console.warn('[scan-digitals] WARN: HAPEE_PIT / HAPEE_LOCATION_ID no configurados — /api/lead fallará.');
+if (!PSI_API_KEY) console.warn('[scan-digitals] WARN: PSI_API_KEY no configurado — PageSpeed Insights estará deshabilitado.');
 const PSI_BASE           = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
 
 // === Utils ===
@@ -318,9 +320,145 @@ app.post('/api/scan', async (req, res) => {
   }
 });
 
+// === Email report builder ===
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+function buildReportHtml({ name, url, score, scanData }) {
+  const s = scanData || {};
+  const psi = s.psi || {};
+  const psiOk = !psi.unavailable && psi.scores;
+  const cons = s.consolidated || {};
+  const recos = Array.isArray(cons.recommendations) ? cons.recommendations.slice(0, 10) : [];
+  const seo = s.seo || {};
+  const aeoScore = cons.aeoScore || 0;
+
+  const scoreColor = score >= 80 ? '#5ec97a' : score >= 60 ? '#e5bb55' : score >= 40 ? '#db666a' : '#db666a';
+  const greet = (name || '').trim().split(/\s+/)[0] || 'Hola';
+  const cwv = psi.coreWebVitals || {};
+
+  return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Auditoría web · ${escapeHtml(url)}</title></head>
+<body style="margin:0;padding:0;background:#0d0d0d;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#f4f4f4;">
+<div style="max-width:640px;margin:0 auto;background:#141414;">
+
+  <div style="padding:32px 36px;border-bottom:1px solid rgba(255,255,255,0.08);">
+    <div style="font-size:28px;font-weight:500;letter-spacing:-0.02em;color:#fff;">Digitals</div>
+    <div style="height:5px;width:130px;background:linear-gradient(90deg,#12809b 0%,#5ec97a 25%,#e5bb55 50%,#e88b3a 75%,#db666a 100%);margin-top:6px;border-radius:2px;"></div>
+    <div style="margin-top:24px;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#7a7a7a;font-weight:600;">Auditoría web · scan.digitals.cl</div>
+  </div>
+
+  <div style="padding:32px 36px;">
+    <p style="margin:0 0 16px;color:#cccccc;font-size:15px;line-height:1.6;">${escapeHtml(greet)}, gracias por usar Digitals Scan.</p>
+    <p style="margin:0 0 24px;color:#cccccc;font-size:15px;line-height:1.6;">Estos son los resultados de la auditoría de <a href="${escapeHtml(url)}" style="color:#12c1d8;text-decoration:none;">${escapeHtml(url)}</a>:</p>
+
+    <div style="background:#0d0d0d;border:1px solid rgba(255,255,255,0.10);border-radius:14px;padding:28px;text-align:center;margin:24px 0;">
+      <div style="font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#7a7a7a;font-weight:600;margin-bottom:8px;">Score global</div>
+      <div style="font-family:'Bebas Neue','Arial Narrow',sans-serif;font-size:88px;line-height:1;font-weight:400;color:${scoreColor};letter-spacing:0.01em;">${score}</div>
+      <div style="font-size:12px;color:#999999;margin-top:4px;">/ 100</div>
+    </div>
+
+    <table role="presentation" style="width:100%;border-collapse:collapse;margin:24px 0;">
+      <tr>
+        ${psiOk ? `
+        <td style="width:25%;padding:14px 8px;text-align:center;background:rgba(18,128,155,0.08);border-radius:10px;">
+          <div style="font-size:9.5px;letter-spacing:0.18em;text-transform:uppercase;color:#7a7a7a;font-weight:700;margin-bottom:6px;">Performance</div>
+          <div style="font-family:'Bebas Neue','Arial Narrow',sans-serif;font-size:32px;color:${psi.scores.performance>=80?'#5ec97a':psi.scores.performance>=50?'#e5bb55':'#db666a'};">${psi.scores.performance}</div>
+        </td>
+        <td style="width:5px;"></td>
+        <td style="width:25%;padding:14px 8px;text-align:center;background:rgba(18,128,155,0.08);border-radius:10px;">
+          <div style="font-size:9.5px;letter-spacing:0.18em;text-transform:uppercase;color:#7a7a7a;font-weight:700;margin-bottom:6px;">SEO</div>
+          <div style="font-family:'Bebas Neue','Arial Narrow',sans-serif;font-size:32px;color:${psi.scores.seo>=80?'#5ec97a':psi.scores.seo>=50?'#e5bb55':'#db666a'};">${psi.scores.seo}</div>
+        </td>
+        <td style="width:5px;"></td>
+        <td style="width:25%;padding:14px 8px;text-align:center;background:rgba(18,128,155,0.08);border-radius:10px;">
+          <div style="font-size:9.5px;letter-spacing:0.18em;text-transform:uppercase;color:#7a7a7a;font-weight:700;margin-bottom:6px;">A11y</div>
+          <div style="font-family:'Bebas Neue','Arial Narrow',sans-serif;font-size:32px;color:${psi.scores.accessibility>=80?'#5ec97a':psi.scores.accessibility>=50?'#e5bb55':'#db666a'};">${psi.scores.accessibility}</div>
+        </td>
+        <td style="width:5px;"></td>
+        <td style="width:25%;padding:14px 8px;text-align:center;background:rgba(229,187,85,0.08);border-radius:10px;">
+          <div style="font-size:9.5px;letter-spacing:0.18em;text-transform:uppercase;color:#7a7a7a;font-weight:700;margin-bottom:6px;">AEO/GEO</div>
+          <div style="font-family:'Bebas Neue','Arial Narrow',sans-serif;font-size:32px;color:${aeoScore>=80?'#5ec97a':aeoScore>=50?'#e5bb55':'#db666a'};">${aeoScore}</div>
+        </td>` : `
+        <td colspan="7" style="padding:14px;text-align:center;background:rgba(229,187,85,0.08);border-radius:10px;border:1px dashed rgba(229,187,85,0.32);">
+          <div style="font-size:11px;color:#e5bb55;font-weight:600;">PageSpeed Insights no estuvo disponible · score basado en SEO + AEO/GEO</div>
+          <div style="margin-top:8px;font-size:9.5px;letter-spacing:0.18em;text-transform:uppercase;color:#7a7a7a;font-weight:700;">AEO/GEO: ${aeoScore}/100</div>
+        </td>`}
+      </tr>
+    </table>
+
+    ${psiOk && (cwv.lcp || cwv.cls) ? `
+    <div style="background:#0d0d0d;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin:24px 0;">
+      <div style="font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#7a7a7a;font-weight:700;margin-bottom:12px;">Core Web Vitals</div>
+      <table role="presentation" style="width:100%;font-size:13px;color:#cccccc;">
+        ${cwv.lcp ? `<tr><td style="padding:4px 0;width:50%;"><strong style="color:#fff;">LCP</strong> Largest Contentful Paint</td><td style="text-align:right;font-family:monospace;color:${cwv.lcp.score>=0.9?'#5ec97a':cwv.lcp.score>=0.5?'#e5bb55':'#db666a'};">${escapeHtml(cwv.lcp.display)}</td></tr>` : ''}
+        ${cwv.cls ? `<tr><td style="padding:4px 0;"><strong style="color:#fff;">CLS</strong> Cumulative Layout Shift</td><td style="text-align:right;font-family:monospace;color:${cwv.cls.score>=0.9?'#5ec97a':cwv.cls.score>=0.5?'#e5bb55':'#db666a'};">${escapeHtml(cwv.cls.display)}</td></tr>` : ''}
+        ${cwv.fcp ? `<tr><td style="padding:4px 0;"><strong style="color:#fff;">FCP</strong> First Contentful Paint</td><td style="text-align:right;font-family:monospace;color:${cwv.fcp.score>=0.9?'#5ec97a':cwv.fcp.score>=0.5?'#e5bb55':'#db666a'};">${escapeHtml(cwv.fcp.display)}</td></tr>` : ''}
+        ${cwv.tbt ? `<tr><td style="padding:4px 0;"><strong style="color:#fff;">TBT</strong> Total Blocking Time</td><td style="text-align:right;font-family:monospace;color:${cwv.tbt.score>=0.9?'#5ec97a':cwv.tbt.score>=0.5?'#e5bb55':'#db666a'};">${escapeHtml(cwv.tbt.display)}</td></tr>` : ''}
+        ${cwv.si ? `<tr><td style="padding:4px 0;"><strong style="color:#fff;">SI</strong> Speed Index</td><td style="text-align:right;font-family:monospace;color:${cwv.si.score>=0.9?'#5ec97a':cwv.si.score>=0.5?'#e5bb55':'#db666a'};">${escapeHtml(cwv.si.display)}</td></tr>` : ''}
+      </table>
+    </div>` : ''}
+
+    ${recos.length ? `
+    <div style="margin:32px 0 16px;">
+      <div style="font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#7a7a7a;font-weight:700;margin-bottom:14px;">Plan de mejoras priorizado · top ${recos.length}</div>
+      ${recos.map((r, i) => `
+        <div style="background:#0d0d0d;border-left:3px solid ${r.severity==='high'?'#db666a':r.severity==='medium'?'#e5bb55':'#12c1d8'};border-radius:6px;padding:14px 18px;margin-bottom:10px;">
+          <div style="font-size:9.5px;letter-spacing:0.22em;text-transform:uppercase;color:${r.severity==='high'?'#db666a':r.severity==='medium'?'#e5bb55':'#12c1d8'};font-weight:700;margin-bottom:6px;">${escapeHtml(r.severity)} · ${escapeHtml(r.area)}</div>
+          <div style="font-size:14px;color:#fff;font-weight:600;margin-bottom:4px;">${i+1}. ${escapeHtml(r.title)}</div>
+          <div style="font-size:13px;color:#aaaaaa;line-height:1.55;">${escapeHtml(r.tip)}</div>
+        </div>
+      `).join('')}
+    </div>` : ''}
+
+    <div style="background:linear-gradient(135deg,rgba(18,128,155,0.14),rgba(229,187,85,0.10));border:1px solid rgba(18,128,155,0.32);border-radius:14px;padding:24px;margin:32px 0 16px;">
+      <div style="font-size:13px;color:#cccccc;line-height:1.6;">¿Quieres que Digitals te haga un <strong style="color:#fff;">upgrade real</strong> de la web? Ejecutamos el plan completo en 3-6 semanas — diseño + dev + AEO/GEO/LLMO + integración con tu CRM.</div>
+      <div style="margin-top:18px;">
+        <a href="https://upgrade.digitals.cl/?url=${encodeURIComponent(url)}" style="display:inline-block;background:#12809b;color:#fff;text-decoration:none;padding:13px 26px;border-radius:100px;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;">Cotizar mi upgrade →</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:24px 36px;border-top:1px solid rgba(255,255,255,0.08);text-align:center;color:#7a7a7a;font-size:11px;line-height:1.7;">
+    <div>Digitals · agencia de marketing digital + IA en Chile</div>
+    <div style="margin-top:4px;"><a href="https://digitals.cl" style="color:#7a7a7a;text-decoration:none;">digitals.cl</a> · <a href="https://scan.digitals.cl" style="color:#7a7a7a;text-decoration:none;">scan.digitals.cl</a> · <a href="https://upgrade.digitals.cl" style="color:#7a7a7a;text-decoration:none;">upgrade.digitals.cl</a></div>
+  </div>
+</div>
+</body></html>`;
+}
+
+async function sendReportEmail({ contactId, email, name, url, score, scanData }) {
+  if (!contactId) return { sent: false, reason: 'no-contact-id' };
+  const html = buildReportHtml({ name, url, score, scanData });
+  const subject = `Tu auditoría web · score ${score}/100 · ${url.replace(/^https?:\/\//, '').replace(/\/$/, '')}`;
+  const body = {
+    type: 'Email',
+    contactId,
+    subject,
+    html,
+    emailFrom: process.env.HAPEE_EMAIL_FROM || 'hola@digitals.cl'
+  };
+  const r = await fetchWithTimeout(`${HAPEE_API_BASE}/conversations/messages`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${HAPEE_PIT}`,
+      'Version': HAPEE_API_VERSION,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  }, 20000);
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    console.error('[hapee email error]', r.status, data);
+    return { sent: false, reason: 'hapee-error', status: r.status, detail: data?.message };
+  }
+  return { sent: true, messageId: data?.messageId || data?.id || null };
+}
+
 app.post('/api/lead', async (req, res) => {
   try {
-    const { name = '', email = '', phone = '', url = '', score = 0 } = req.body || {};
+    const { name = '', email = '', phone = '', url = '', score = 0, scanData = null } = req.body || {};
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ error: 'Email inválido' });
     }
@@ -357,7 +495,19 @@ app.post('/api/lead', async (req, res) => {
       console.error('[hapee error]', r.status, data);
       return res.status(502).json({ error: 'No se pudo crear el contacto en CRM', detail: data?.message });
     }
-    res.json({ ok: true, contactId: data?.contact?.id || data?.id || null });
+
+    const contactId = data?.contact?.id || data?.id || null;
+
+    // Enviar reporte por email (no bloqueante en caso de fallo)
+    let emailResult = { sent: false };
+    try {
+      emailResult = await sendReportEmail({ contactId, email, name, url, score, scanData });
+    } catch (emailErr) {
+      console.error('[email send error]', emailErr);
+      emailResult = { sent: false, reason: 'exception', detail: emailErr.message };
+    }
+
+    res.json({ ok: true, contactId, email: emailResult });
   } catch (e) {
     console.error('[lead error]', e);
     res.status(500).json({ error: e.message });
